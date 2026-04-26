@@ -123,8 +123,9 @@ def webhook():
     if "bmu.monitoring@orbem.ai" not in sender.lower():
         return jsonify({"status": "ignored", "reason": "not from BMU monitoring"}), 200
 
-    # Only alert on Sundays
-    if not is_oncall_day():
+    # Only alert on Sundays (unless testing mode is on)
+    testing_mode = os.environ.get("TESTING_MODE", "false").lower() == "true"
+    if not testing_mode and not is_oncall_day():
         return jsonify({"status": "ignored", "reason": "not on-call day"}), 200
 
     error_code = extract_error_code(subject)
